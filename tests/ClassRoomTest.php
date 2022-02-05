@@ -15,8 +15,9 @@ class ClassRoomTest extends TestCase
     public function test_teacher_write_on_the_board()
     {
         $teacher = new Teacher($this->faker->name);
-        $student = new Student("Ali");
         $classRoom = new ClassRoom($teacher);
+        $teacher->writeOnBoard("Teacher write");
+        $this->assertEquals($classRoom->readBoard(), "Teacher write");
     }
 
     public function test_every_one_can_read_board()
