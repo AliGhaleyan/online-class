@@ -55,6 +55,9 @@ class ClassRoom
 
     public function setWriter(Person $person): self
     {
+        if ($this->writer)
+            $this->writer->takePencil();
+
         $person->givePencil($this->pencil);
         $this->writer = $person;
         return $this;
