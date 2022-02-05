@@ -1,6 +1,5 @@
 <?php
 
-use App\Board;
 use App\ClassRoom;
 use App\Student;
 use App\Teacher;

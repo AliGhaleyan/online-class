@@ -8,7 +8,7 @@ use DateTime;
 class ClassRoom
 {
     public ?DateTime $startedAt = null;
-    public ?DateTime $endAt = null;
+    public ?DateTime $endedAt = null;
 
     private Board $board;
     private Teacher $teacher;
@@ -43,7 +43,7 @@ class ClassRoom
 
     public function end()
     {
-        $this->endAt = new DateTime();
+        $this->endedAt = new DateTime();
     }
 
     public function join(Student $student): self
