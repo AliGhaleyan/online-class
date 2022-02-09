@@ -7,13 +7,32 @@ namespace App;
 class Teacher extends Person
 {
     private ?AttendanceBook $attendanceBook;
+    private array $writeRequests = [];
 
-    public function __construct(string $name)
+    public function __construct(string $name, Marker $marker)
     {
         parent::__construct($name);
-        $this->marker = new Marker();
-        $this->marker->setOwner($this);
-        $this->marker->setWriter($this);
+        $this->marker = $marker;
+    }
+
+    public function addWriteRequest(Student $student)
+    {
+        $this->writeRequests[] = $student;
+    }
+
+    public function acceptWriteRequest(Student $student)
+    {
+        $index = array_search($student, $this->writeRequests);
+        if ($index === false) return;
+        $this->assignMaker($student);
+        array_splice($this->writeRequests, $index, 1);
+    }
+
+    public function rejectWriteRequest(Student $student)
+    {
+        $index = array_search($student, $this->writeRequests);
+        if ($index === false) return;
+        array_splice($this->writeRequests, $index, 1);
     }
 
     public function setAttendanceBook(AttendanceBook $attendanceBook)
@@ -23,14 +42,14 @@ class Teacher extends Person
 
     public function assignMaker(Student $student)
     {
-        $this->marker->setWriter($student);
         $student->marker = $this->marker;
+        $this->revokeMarker();
     }
 
-    public function revokeMarker(Student $student)
+    public function takeBackMarker(Student $student)
     {
-        $student->marker = null;
-        $this->marker->setWriter($this);
+        $this->marker = $student->marker;
+        $student->revokeMarker();
     }
 
     public function startTeaching()
