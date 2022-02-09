@@ -29,6 +29,11 @@ class AttendanceBook
         $this->endedAt = new DateTime();
     }
 
+    public function headCount()
+    {
+        return count($this->students);
+    }
+
     public function joinStudent(Student $student): self
     {
         $this->students[] = $student;

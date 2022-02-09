@@ -4,6 +4,7 @@ use App\Board;
 use App\Marker;
 use App\Student;
 use App\Teacher;
+use App\AttendanceBook;
 use Faker\Factory;
 use Faker\Generator;
 use App\Exceptions\WriteAccessDeniedException;
@@ -96,7 +97,11 @@ class ClassRoomTest extends TestCase
 
     public function test_student_head_count()
     {
-        //
+        $students = $this->makeFakeStudents(10);
+        $attendanceBook = new AttendanceBook();
+        foreach ($students as $student)
+            $attendanceBook->joinStudent($student);
+        $this->assertEquals($attendanceBook->headCount(), 10);
     }
 
     public function test_student_late_head_count()
@@ -125,7 +130,7 @@ class ClassRoomTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    protected function makeFakeStudents(int $count = 10): array
+    protected function makeFakeStudents(int $count): array
     {
         $students = [];
         for ($i = 0; $i < $count; $i++)
