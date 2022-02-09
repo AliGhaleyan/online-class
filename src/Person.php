@@ -4,33 +4,29 @@
 namespace App;
 
 
-abstract class Person
+abstract class Person implements BoardObservable
 {
     public int $id;
     public string $name;
-    protected ?Pencil $pencil = null;
+    public ?Marker $marker = null;
 
     public function __construct(string $name)
     {
-        $this->id = time();
+        $this->id = rand(1000,9999);
         $this->name = $name;
     }
 
-    public function givePencil(Pencil $pencil): self
+    public function writeOnBoard(Board $board, string $text)
     {
-        $this->pencil = $pencil;
-        return $this;
+        if (!$this->marker) throw new \Exception("You can not write on board.");
+        if ($this->marker->writer->id != $this->id)
+            throw new \Exception("You can not write with this marker.");
+
+        $this->marker->write($board, $text);
     }
 
-    public function takePencil()
+    public function readBoard(Board $board)
     {
-        $this->pencil = null;
-    }
-
-    public function writeOnBoard(string $text)
-    {
-        if (!$this->pencil) throw new \Exception("You can not write on the board.");
-
-        $this->pencil->write($text);
+        // do something
     }
 }

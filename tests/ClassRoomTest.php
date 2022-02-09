@@ -1,10 +1,11 @@
 <?php
 
-use App\ClassRoom;
+use App\Board;
 use App\Student;
 use App\Teacher;
 use Faker\Factory;
 use Faker\Generator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ClassRoomTest extends TestCase
@@ -13,20 +14,30 @@ class ClassRoomTest extends TestCase
 
     public function test_teacher_write_on_the_board()
     {
-        $teacher = new Teacher($this->faker->name);
-        $classRoom = new ClassRoom($teacher);
-        $teacher->writeOnBoard("Teacher write");
-        $this->assertEquals($classRoom->readBoard(), "Teacher write");
+        $board = new Board();
+        $teacher = $this->makeTeacher();
+        $teacher->writeOnBoard($board, "Hello World!");
+        $this->assertEquals($board->read(), "Hello World!");
     }
 
     public function test_every_one_can_read_board()
     {
-        //
+        $board = new Board();
+        $student = $this->makeStudentMock();
+        $student->expects($this->once())->method("readBoard")->with($board);
+        $teacher = $this->makeTeacher();
+        $board->addSubscriber($teacher)
+            ->addSubscriber($student);
+        $teacher->writeOnBoard($board, "Hello World!");
     }
 
     public function test_student_ask_write_permission()
     {
-        //
+        $board = new Board();
+        $teacher = $this->makeTeacher();
+        $student = $this->makeStudent();
+        $teacher->assignMaker($student);
+        $student->writeOnBoard($board, "Hello World!");
     }
 
     public function test_teacher_take_back_write_permission()
@@ -62,15 +73,35 @@ class ClassRoomTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->faker = $faker = Factory::create();
+        $this->faker = Factory::create();
     }
 
     protected function makeFakeStudents(int $count = 10): array
     {
         $students = [];
         for ($i = 0; $i < $count; $i++)
-            $students[] = new Student($this->faker->name);
+            $students[] = $this->makeStudent();
 
         return $students;
+    }
+
+    protected function makeTeacher()
+    {
+        return new Teacher($this->faker->name);
+    }
+
+    protected function makeStudent()
+    {
+        return new Student($this->faker->name);
+    }
+
+    /**
+     * @return MockObject|Student
+     */
+    protected function makeStudentMock()
+    {
+        return $this->getMockBuilder(Student::class)
+            ->setConstructorArgs([$this->faker->name])
+            ->getMock();
     }
 }
