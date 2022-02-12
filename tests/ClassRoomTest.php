@@ -98,7 +98,8 @@ class ClassRoomTest extends TestCase
     public function test_student_head_count()
     {
         $students = $this->makeFakeStudents(10);
-        $attendanceBook = new AttendanceBook();
+        $attendanceBook = new AttendanceBook(new DateTime());
+        $attendanceBook->start();
         foreach ($students as $student)
             $attendanceBook->joinStudent($student);
         $this->assertEquals($attendanceBook->headCount(), 10);
@@ -106,12 +107,39 @@ class ClassRoomTest extends TestCase
 
     public function test_student_late_head_count()
     {
-        //
+        $students = $this->makeFakeStudents(10);
+        $datetime = new DateTime();
+        $datetime->modify("-10 minutes");
+        $attendanceBook = new AttendanceBook($datetime);
+        $attendanceBook->startedAt = $datetime;
+        foreach ($students as $student)
+            $attendanceBook->joinStudent($student);
+
+        $this->assertEquals($attendanceBook->headCount(),  0);
+    }
+
+    public function test_teacher_start_and_end_teaching()
+    {
+        $marker = new Marker();
+        $teacher = new Teacher($this->faker->name, $marker);
+        $attendanceBook = new AttendanceBook(new DateTime());
+        $teacher->setAttendanceBook($attendanceBook);
+        $teacher->startTeaching();
+        $teacher->endTeaching();
+        $this->assertNotNull($attendanceBook->startedAt);
+        $this->assertNotNull($attendanceBook->endedAt);
     }
 
     public function test_teacher_late()
     {
-        //
+        $this->expectException(\App\Exceptions\ClassStartedLateException::class);
+        $marker = new Marker();
+        $teacher = new Teacher($this->faker->name, $marker);
+        $datetime = new DateTime();
+        $datetime->modify("-31 minutes");
+        $attendanceBook = new AttendanceBook($datetime);
+        $teacher->setAttendanceBook($attendanceBook);
+        $teacher->startTeaching();
     }
 
     /**

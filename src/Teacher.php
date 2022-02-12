@@ -28,13 +28,6 @@ class Teacher extends Person
         array_splice($this->writeRequests, $index, 1);
     }
 
-    public function rejectWriteRequest(Student $student)
-    {
-        $index = array_search($student, $this->writeRequests);
-        if ($index === false) return;
-        array_splice($this->writeRequests, $index, 1);
-    }
-
     public function setAttendanceBook(AttendanceBook $attendanceBook)
     {
         $this->attendanceBook = $attendanceBook;
